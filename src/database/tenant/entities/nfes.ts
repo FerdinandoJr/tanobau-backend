@@ -39,8 +39,8 @@ export class NFeModel {
     })
     tipo_documento!: DocumentType
 
-    @Column({ type: "text", comment: "XML bruto da NFE" })
-    xml_bruto!: string
+    @Column({ type: "text", nullable: true, comment: "XML bruto da NFE" })
+    xml_bruto?: string | null
 
     @Column({ type: "timestamp", comment: "Data de emissão da NFE" })
     data_emissao!: Date

@@ -17,7 +17,7 @@ export interface INFe {
     numero_nfe: number
     serie_nfe: number
     tipo_documento: DocumentType
-    xml_bruto: string
+    xml_bruto?: string | null
     data_emissao: Date
     valor_total: number
     cnpj_emitente: string
@@ -39,7 +39,7 @@ export class NFe implements INFe {
     numero_nfe: number
     serie_nfe: number
     tipo_documento: DocumentType
-    xml_bruto: string
+    xml_bruto?: string | null
     data_emissao: Date
     valor_total: number
     cnpj_emitente: string

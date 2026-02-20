@@ -19,7 +19,26 @@ export class NFeRepository implements INFeRepository {
         const { limit, start, q, status, uf, cnpj_emitente, data_inicio, data_fim, sortBy, sortDir } = filter
         const alias = "nfe"
 
-        const qb = this.repo.createQueryBuilder(alias)
+        const qb = this.repo.createQueryBuilder(alias).select([
+            `${alias}.id`,
+            `${alias}.uuid`,
+            `${alias}.ch_nfe`,
+            `${alias}.nsu`,
+            `${alias}.uf`,
+            `${alias}.numero_nfe`,
+            `${alias}.serie_nfe`,
+            `${alias}.tipo_documento`,
+            `${alias}.data_emissao`,
+            `${alias}.valor_total`,
+            `${alias}.cnpj_emitente`,
+            `${alias}.nome_emitente`,
+            `${alias}.cnpj_destinatario`,
+            `${alias}.nome_destinatario`,
+            `${alias}.natureza_operacao`,
+            `${alias}.tipo_movimentacao`,
+            `${alias}.status`,
+            `${alias}.createdAt`
+        ])
 
         // Filtro de Texto (Busca Global)
         if (q?.trim()) {

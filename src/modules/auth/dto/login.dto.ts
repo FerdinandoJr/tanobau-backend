@@ -15,60 +15,19 @@ export class AuthenticateDTO {
   password!: string;
 }
 
-type CompanyResponseDTO = {
-  uuid: string
-  tradeName: string
-  companyName: string
-  cnpj: string
-  version: string
-  // config: TenantSettingsResponseDTO,
-  status: TenantStatus
-}
-
 export class LoginResponseDTO {
   user!: UserResponseDTO
   token?: string
   refreshToken?: string
-  companies!: CompanyResponseDTO[]
 
   static from(input: {
     user: IUser
     tokenPair?: TokenPair
-    tenants: ITenant[]
   }): LoginResponseDTO {
     return {
       user: UserResponseMapper.toListItem(input.user),
       token: input.tokenPair?.accessToken,
-      refreshToken: input.tokenPair?.refreshToken,
-      companies: input.tenants.map(t => ({
-        uuid: t.uuid,
-        tradeName: t.tradeName,
-        companyName: t.companyName,
-        cnpj: t.cnpj.value,
-        version: t.apiVersion,
-        status: t.status,
-        // config: TenantSettingsResponseMapper.toListItem(t.settings),
-      }))
-    }
-  }
-
-  static fromCreateTenant(input: {
-    user: IUser
-    token: string
-    tenants: ITenant[]
-  }): LoginResponseDTO {
-    return {
-      user: UserResponseMapper.toListItem(input.user),
-      token: input.token,
-      companies: input.tenants.map(t => ({
-        uuid: t.uuid,
-        tradeName: t.tradeName,
-        companyName: t.companyName,
-        cnpj: t.cnpj.value,
-        version: t.apiVersion,
-        status: t.status,
-        // config: TenantSettingsResponseMapper.toListItem(t.settings)
-      }))
+      refreshToken: input.tokenPair?.refreshToken
     }
   }
 }

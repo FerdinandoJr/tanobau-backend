@@ -1,7 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException, Inject } from "@nestjs/common"
 import { DataSource } from "typeorm"
 import { seedTenantData } from "./data/seed/tenant.seeds"
-import { CreateTenantDTO } from "./dto/create-tenant.dto"
 import { TenantModel } from "database/public/entities/tenant"
 import { UserStatus } from "modules/users/domain/valueObjects"
 import { TenantStatus } from "./domain/valueObjects/tenant-status.enum"
@@ -20,15 +19,10 @@ export class TenantService {
     private readonly tenantMgr: TenantConnectionManager
   ) { }
 
-  async create(input: CreateTenantDTO) {
-    const validated = input.validate()
-    return await this.repoTenant.create(validated)
-  }
 
-
-  async createSchemaForUser(userUuid: string, tenantUuid: string) {
+  async createSchemaForUser(userUuid: string, tenantName: string) {
     // Validações
-    const tenant = await this.repoTenant.findByUuid(tenantUuid)
+    const tenant = await this.repoTenant.findByName(tenantName)
     if (!tenant) throw new NotFoundException("Tenant Not Found")
     if (tenant.status === TenantStatus.CREATE) throw new BadRequestException("Tenant already exists")
 

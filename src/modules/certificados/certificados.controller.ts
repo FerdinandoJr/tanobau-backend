@@ -1,4 +1,4 @@
-import { Body, Controller, DefaultValuePipe, Delete, Get, HttpCode, Param, ParseUUIDPipe, Patch, Post, Put, Query, ParseIntPipe, ParseBoolPipe } from "@nestjs/common"
+import { BadRequestException, Body, Controller, DefaultValuePipe, Delete, Get, HttpCode, Param, ParseUUIDPipe, Patch, Post, Put, Query, ParseIntPipe, ParseBoolPipe, UseInterceptors, UploadedFile } from "@nestjs/common"
 
 import { Auth } from "core/http/decorators/auth.decorator"
 import { SortByPipe } from "core/http/pipes/sortBy.pipe"
@@ -11,6 +11,7 @@ import { UpdateCertificadoDTO } from "./dto/update-certificado.dto"
 import { CertificadoService } from "./certificados.service"
 import { UpdateCertificadoBatchDTO } from "./dto/update-certificado-batch.dto"
 import { CreateCertificadoBatchDTO } from "./dto/create-certificado-batch.dto"
+import { FileInterceptor } from "@nestjs/platform-express"
 
 @Auth()
 @Controller("certificados")
@@ -88,10 +89,15 @@ export class CertificadoController {
     }
 
     @Post()
-    @HttpCode(201)
-    async create(@Body() body: CreateCertificadoDTO) {
-        return await this.service.create(body)
+    @UseInterceptors(FileInterceptor('file')) // 'file' é o nome do campo no formulário
+    async create(
+        @UploadedFile() file: Express.Multer.File,
+        @Body() body: CreateCertificadoDTO
+    ) {
+        if (!file) throw new BadRequestException("Arquivo do certificado é obrigatório")
+        return await this.service.create(body, file.buffer)
     }
+
 
     @Put(":uuid")
     async update(@Param("uuid", ParseUUIDPipe) uuid: string, @Body() body: UpdateCertificadoDTO) {

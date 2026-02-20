@@ -4,6 +4,7 @@ import jwt, { JwtPayload as LibJwtPayload, SignOptions } from 'jsonwebtoken'
 import { JwtPayload, JwtPayloadCreateTenant, TokenPair } from './jwt.types'
 import { IUser } from 'modules/users/domain/entities/user'
 import { ITenant } from 'modules/tenants/domain/entities/tenant'
+import { TenantStatus } from 'modules/tenants/domain/valueObjects/tenant-status.enum'
 
 @Injectable()
 export class AppJwtService {
@@ -91,9 +92,15 @@ export class AppJwtService {
   }
 
   createJwtPayload(user: IUser, tenant: ITenant): JwtPayload {
-    return {
+    const payload: JwtPayload = {
       sub: user.uuid,
       tid: tenant.name
     }
+
+    if(tenant.status === TenantStatus.NOT_CREATE) {
+      payload.status = 'not_create'
+    }
+
+    return payload
   }
 }

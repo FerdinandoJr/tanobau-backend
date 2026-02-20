@@ -1,8 +1,8 @@
-import { IsEmail, IsString, Length, MinLength } from "class-validator";
-import { uuidv7 } from "uuidv7";
-import { IUser, User } from "../domain/entities/user";
-import { Email } from "core/valueObjects";
-import { UserStatus, UserType } from "../domain/valueObjects";
+import { IsEmail, IsString, Length, MinLength } from "class-validator"
+import { uuidv7 } from "uuidv7"
+import { IUser, User } from "../domain/entities/user"
+import { Email } from "core/valueObjects"
+import { UserStatus, UserType } from "../domain/valueObjects"
 
 export class CreateUserDTO {
 
@@ -32,10 +32,10 @@ export class CreateUserDTO {
       lastName: this.lastName,
       email: new Email(this.email),
       password: this.password,
-      status: UserStatus.UNVERIFIED,
+      status: UserStatus.ACTIVE,
       type: UserType.USER,
       createdAt: new Date(),
-      tenants: [],
+      tenant: null,
     })
   }
 }

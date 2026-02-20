@@ -1,4 +1,5 @@
 import { IsString, IsBoolean, IsEnum, IsOptional, IsDateString, IsNotEmpty } from "class-validator"
+import { Transform } from "class-transformer"
 import { uuidv7 } from "uuidv7"
 
 import { ICertificado, Certificado } from "../domain/entities/certificado"
@@ -6,8 +7,6 @@ import { CertificadoAmbiente } from "../domain/valueObjects/certificado-ambiente
 import { CNPJ } from "core/valueObjects/cnpj"
 
 export class CreateCertificadoDTO {
-    @IsNotEmpty()
-    binaryFile!: Buffer
 
     @IsString()
     @IsNotEmpty()
@@ -39,21 +38,14 @@ export class CreateCertificadoDTO {
     @IsString()
     subject?: string
 
-    @IsOptional()
-    @IsBoolean()
-    isPrimary?: boolean
 
-    @IsOptional()
-    @IsBoolean()
-    isActive?: boolean
-
-    public validate(): ICertificado {
+    public validate(binaryFile: Buffer): ICertificado {
         const uuid = uuidv7()
 
         return new Certificado({
             id: 0,
             uuid,
-            binaryFile: this.binaryFile,
+            binaryFile,
             passwordEncrypted: this.passwordEncrypted,
             cnpj: new CNPJ(this.cnpj),
             companyName: this.companyName,
@@ -62,8 +54,8 @@ export class CreateCertificadoDTO {
             ambiente: this.ambiente,
             issuer: this.issuer,
             subject: this.subject,
-            isPrimary: this.isPrimary ?? false,
-            isActive: this.isActive ?? true,
+            isPrimary: false,
+            isActive: true,
             createdAt: new Date()
         })
     }

@@ -42,17 +42,17 @@ export class CertificadoService {
         return await this.repo.findByCnpj(cnpj)
     }
 
-    async create(input: CreateCertificadoDTO) {
-        const validated = input.validate()
+    async create(input: CreateCertificadoDTO, binaryFile: Buffer) {
+        const validated = input.validate(binaryFile)
         return await this.repo.create(validated)
     }
 
     async createBatch(body: CreateCertificadoBatchDTO) {
-        const { items } = body
-        if (items.length > 50) throw new BadRequestException("O limite máximo é de 50 registros por lote.")
-        const validated = items.map(dto => dto.validate())
-        const savedItems = await this.repo.createMany(validated)
-        return { items: savedItems }
+        // const { items } = body
+        // if (items.length > 50) throw new BadRequestException("O limite máximo é de 50 registros por lote.")
+        // const validated = items.map(dto => dto.validate())
+        // const savedItems = await this.repo.createMany(validated)
+        // return { items: savedItems }
     }
 
     async updateBatch(body: UpdateCertificadoBatchDTO) {

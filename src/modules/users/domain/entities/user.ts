@@ -14,12 +14,13 @@ export interface IUser {
     status: UserStatus
     type: UserType
     createdAt: Date
-    tenants: ITenant[]
+    tenant: ITenant | null
 
     generateVerificationCode(): string
+    getFullName(): string
 }
 
-type UserProps = Omit<IUser, 'generateVerificationCode'>
+type UserProps = Omit<IUser, 'generateVerificationCode' | 'getFullName'>
 
 export class User implements IUser {
     id: UserId
@@ -31,7 +32,7 @@ export class User implements IUser {
     status: UserStatus
     type: UserType
     createdAt: Date
-    tenants: ITenant[]
+    tenant: ITenant | null
 
     constructor(props: UserProps) {
         this.id = props.id
@@ -43,7 +44,7 @@ export class User implements IUser {
         this.status = props.status
         this.type = props.type
         this.createdAt = props.createdAt
-        this.tenants = props.tenants
+        this.tenant = props.tenant
     }
 
 
@@ -59,4 +60,8 @@ export class User implements IUser {
         }
         return out
     }
+
+    public getFullName(): string {
+        return `${this.firstName} ${this.lastName}`
+    }   
 }

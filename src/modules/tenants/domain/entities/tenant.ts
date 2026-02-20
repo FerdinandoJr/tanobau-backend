@@ -9,9 +9,6 @@ export interface ITenant {
     uuid: string
     apiVersion: string
     name: string
-    cnpj: CNPJ
-    companyName: string
-    tradeName: string
     status: TenantStatus
     createdAt: Date
     isActive: boolean
@@ -22,9 +19,6 @@ export class Tenant implements ITenant {
     uuid: string
     apiVersion: string
     name: string
-    cnpj: CNPJ
-    companyName: string
-    tradeName: string
     status: TenantStatus
     createdAt: Date
     isActive: boolean
@@ -35,9 +29,6 @@ export class Tenant implements ITenant {
         this.uuid = props.uuid
         this.apiVersion = props.apiVersion
         this.name = props.name
-        this.cnpj = props.cnpj
-        this.companyName = props.companyName
-        this.tradeName = props.tradeName
         this.status = props.status
         this.createdAt = props.createdAt
         this.isActive = props.isActive

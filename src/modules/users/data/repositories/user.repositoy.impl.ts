@@ -50,21 +50,21 @@ export class UserRepository implements IUserRepository {
     }
 
     async findByUuid(uuid: string) {
-        const ent = await this.repo.findOne({ where: { uuid }, relations: ["userTenants", "userTenants.tenant", "userTenants.tenant.settings"] })
+        const ent = await this.repo.findOne({ where: { uuid }, relations: ["tenant"] })
         return ent ? UserUtils.toDomain(ent) : null
     }
 
     async findByEmail(email: Email) {
         const user = await this.repo.findOne({
             where: { email },
-            relations: ["userTenants", "userTenants.tenant", "userTenants.tenant.settings"]
+            relations: ["tenant"]
         });
         return user ? UserUtils.toDomain(user) : null;
     }
 
     async create(user: IUser) {
         try {
-            const created = this.repo.create({ ...user })
+            const created = this.repo.create({ ...UserUtils.toModel(user) })
             const saved = await this.repo.save(created)
             return UserUtils.toDomain(saved)
         } catch (err: any) {

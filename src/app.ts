@@ -8,6 +8,7 @@ import { NFeModule } from "./modules/nfes/nfes.module"
 import { SefazModule } from "./modules/sefaz/sefaz.module"
 import { TenantModule } from "./modules/tenants/tenant.module"
 import { UserModule } from "./modules/users/user.module"
+import { AuthModule } from "modules/auth/auth.module"
 
 
 @Module({
@@ -15,6 +16,7 @@ import { UserModule } from "./modules/users/user.module"
         ConfigModule.forRoot({ isGlobal: true }),
         CoreModule,
         DatabaseModule,
+        AuthModule,
         TenantModule,
         CertificadoModule,
         NFeModule,

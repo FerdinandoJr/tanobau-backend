@@ -8,7 +8,6 @@ import { ITenant } from "modules/tenants/domain/entities/tenant"
 import { ITenantRepository } from "modules/tenants/domain/repositories/tenant.repository"
 import { IUser } from "modules/users/domain/entities/user"
 import { PUBLIC_DATA_SOURCE } from "database/public/public.datasource.provider"
-import { CNPJ } from "core/valueObjects"
 
 
 export class TenantRepository implements ITenantRepository {
@@ -26,8 +25,8 @@ export class TenantRepository implements ITenantRepository {
         return tenants.map(TenantUtils.toDomain)
     }
 
-    async findByCnpj(cnpj: CNPJ): Promise<ITenant | null> {
-        const ent = await this.repo.findOne({ where: { cnpj } })
+    async findByName(name: string): Promise<ITenant | null> {
+        const ent = await this.repo.findOne({ where: { name } })
         return ent ? TenantUtils.toDomain(ent) : null
     }
 

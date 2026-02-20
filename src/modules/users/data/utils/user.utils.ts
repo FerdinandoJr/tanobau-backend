@@ -27,7 +27,7 @@ export class UserUtils {
             status: model.status,
             type: model.type,
             createdAt: model.createdAt,
-            tenants: model.userTenants?.map(t => TenantUtils.toDomain(t.tenant))
+            tenant: model.tenant ? TenantUtils.toDomain(model.tenant) : null
         })
     }
 

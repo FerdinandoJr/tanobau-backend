@@ -2,9 +2,8 @@ import { cnpjTransformer } from "database/transformers/cnpj.transformers"
 import { TenantStatus } from "modules/tenants/domain/valueObjects/tenant-status.enum"
 import { Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm"
 import { UserModel } from "./user"
-import { CNPJ } from "core/valueObjects/cnpj"
 
-@Entity({ schema: "public", name: "tenants", comment: "Tabela de tenants, representa uma empresa ou grupo empresarial que utiliza o sistema" })
+@Entity({ schema: "public", name: "tenants", comment: "Tabela de tenants, representa um schema que utiliza o sistema" })
 export class TenantModel {
     @PrimaryGeneratedColumn({ comment: "Código auto-incremental" })
     id!: number
@@ -21,20 +20,6 @@ export class TenantModel {
 
     @Column({ type: "varchar", comment: "Versão da api para esse tenant" })
     apiVersion!: string
-
-    @Column({
-        type: "varchar",
-        comment: "CNPJ da empresa",
-        unique: true,
-        transformer: cnpjTransformer,
-    })
-    cnpj!: CNPJ
-
-    @Column({ type: "varchar", comment: "Razão social da empresa" })
-    companyName!: string
-
-    @Column({ type: "varchar", comment: "Nome fantasia da empresa" })
-    tradeName!: string
 
     @Column({
         type: "enum",

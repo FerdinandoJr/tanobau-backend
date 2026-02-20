@@ -1,7 +1,8 @@
 // Payload que vai dentro dos tokens
 export interface JwtPayload {
   sub: string
-  tid: string
+  tid: string,
+  status?: 'not_create' | null
 }
 
 export interface JwtPayloadCreateTenant {

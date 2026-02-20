@@ -19,8 +19,7 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() body: RegisterUserDTO) {
-    await this.service.register(body)
-    return { ok: true }
+    return await this.service.register(body)
   }
 
 }
