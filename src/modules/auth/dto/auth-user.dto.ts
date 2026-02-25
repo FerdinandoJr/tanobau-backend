@@ -20,7 +20,7 @@ export class AuthUserDTO {
       lastName: user.lastName,
       email: emailValue,
       status: user.status,
-      type: user.type ?? UserType.USER,
+      type: user.type ?? UserType.ACCOUNTANT,
       createdAt: user.createdAt
     }
   }

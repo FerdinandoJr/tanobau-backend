@@ -1,5 +1,5 @@
-import { CNPJ } from "core/valueObjects"
 import { TenantStatus } from "../valueObjects/tenant-status.enum"
+import { ICompany } from "modules/companies/domain/entities/company"
 
 export type TenantId = number
 
@@ -12,6 +12,7 @@ export interface ITenant {
     status: TenantStatus
     createdAt: Date
     isActive: boolean
+    company?: ICompany | null
 }
 
 export class Tenant implements ITenant {
@@ -22,9 +23,9 @@ export class Tenant implements ITenant {
     status: TenantStatus
     createdAt: Date
     isActive: boolean
+    company?: ICompany | null
 
     constructor(props: ITenant) {
-        // todo: fazer validações
         this.id = props.id
         this.uuid = props.uuid
         this.apiVersion = props.apiVersion
@@ -32,5 +33,6 @@ export class Tenant implements ITenant {
         this.status = props.status
         this.createdAt = props.createdAt
         this.isActive = props.isActive
+        this.company = props.company
     }
 }

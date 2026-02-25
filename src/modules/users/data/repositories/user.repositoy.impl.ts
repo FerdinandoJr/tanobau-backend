@@ -1,8 +1,6 @@
 import { ConflictException, Inject, Injectable, NotFoundException } from "@nestjs/common"
 import { Brackets, DataSource, Repository } from "typeorm"
-
 import { UserUtils } from "../utils/user.utils"
-
 import { Email } from "core/valueObjects"
 import { UserModel } from "database/public/entities/user"
 import { PUBLIC_DATA_SOURCE } from "database/public/public.datasource.provider"
@@ -50,14 +48,14 @@ export class UserRepository implements IUserRepository {
     }
 
     async findByUuid(uuid: string) {
-        const ent = await this.repo.findOne({ where: { uuid }, relations: ["tenant"] })
+        const ent = await this.repo.findOne({ where: { uuid }, relations: ["userTenants", "userTenants.company"] })
         return ent ? UserUtils.toDomain(ent) : null
     }
 
     async findByEmail(email: Email) {
         const user = await this.repo.findOne({
             where: { email },
-            relations: ["tenant"]
+            relations: ["userTenants", "userTenants.company"]
         });
         return user ? UserUtils.toDomain(user) : null;
     }

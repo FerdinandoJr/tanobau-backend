@@ -1,14 +1,12 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException, Inject } from "@nestjs/common"
 import { DataSource } from "typeorm"
-import { seedTenantData } from "./data/seed/tenant.seeds"
-import { TenantModel } from "database/public/entities/tenant"
 import { UserStatus } from "modules/users/domain/valueObjects"
 import { TenantStatus } from "./domain/valueObjects/tenant-status.enum"
 import { TenantRepository } from "./data/repositories/tenant.repository.impl"
 import { UserRepository } from "modules/users/data/repositories/user.repositoy.impl"
 import { PUBLIC_DATA_SOURCE } from "database/public/public.datasource.provider"
 import { TenantConnectionManager } from "database/tenant/tenant.connection.manager"
-import { UserModel } from "database/public/entities/user"
+import { AppJwtService } from "core/security/jwt/jwt.service"
 
 @Injectable()
 export class TenantService {
@@ -16,71 +14,53 @@ export class TenantService {
     @Inject(PUBLIC_DATA_SOURCE) private readonly publicDs: DataSource,
     @Inject(TenantRepository) private readonly repoTenant: TenantRepository,
     @Inject(UserRepository) private readonly repoUser: UserRepository,
-    private readonly tenantMgr: TenantConnectionManager
+    private readonly tenantMgr: TenantConnectionManager,
+    private readonly jwt: AppJwtService,
   ) { }
 
 
   async createSchemaForUser(userUuid: string, tenantName: string) {
-    // Validações
-    const tenant = await this.repoTenant.findByName(tenantName)
+    // 1. Validações Iniciais
+    const [tenant, user] = await Promise.all([
+      this.repoTenant.findByName(tenantName),
+      this.repoUser.findByUuid(userUuid)
+    ])
+
     if (!tenant) throw new NotFoundException("Tenant Not Found")
-    if (tenant.status === TenantStatus.CREATE) throw new BadRequestException("Tenant already exists")
+    if (user?.status !== UserStatus.ACTIVE) throw new BadRequestException("User Not Active")
+    if (tenant.status === TenantStatus.CREATE) throw new BadRequestException("Tenant already created")
 
-    const user = await this.repoUser.findByUuid(userUuid)
-    if (!user) throw new NotFoundException("User Not Found")
-    if (user.status !== UserStatus.ACTIVE) throw new BadRequestException("User Not Active")
-
-    // Cria schema
     const schemaName = tenant.name
+
     try {
-      await this.publicDs.query(`CREATE SCHEMA "${schemaName}"`)
-    } catch (err: any) {
-      if (err?.code === "42P06") {
-        throw new ConflictException("Tenant ja existe")
-      }
-      throw err
-    }
+      // 2. Criação Física do Schema (DDL)
+      await this.publicDs.query(`CREATE SCHEMA IF NOT EXISTS "${schemaName}"`)
 
-    // Configura tenant
-    const tenantDs = await this.tenantMgr.getOrCreate(schemaName)
-    tenantDs.setOptions({
-      schema: schemaName,
-      synchronize: false,
-      migrationsRun: false,
-      dropSchema: false,
-      logging: false,
-    })
+      // 3. Marcar Início do Processo no Public (Evita concorrência)
+      await this.repoTenant.update(tenant.uuid, { status: TenantStatus.INITIALIZING })
 
-    // Inicializa tenant
-    try {
-
+      // 4. Conexão e Migração do Tenant
+      const tenantDs = await this.tenantMgr.getOrCreate(schemaName)
       await tenantDs.query(`SET search_path TO "${schemaName}", public`)
       await tenantDs.runMigrations({ transaction: "all" })
 
-      await seedTenantData(tenantDs, user)
-    } catch (err) {
-      await this.publicDs.query(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`)
-      throw err
-    }
+      // 5. Finalização com Sucesso
+      const updatedTenant = await this.repoTenant.update(tenant.uuid, { status: TenantStatus.CREATE })
 
-    // Atualiza tenant e user com Transactions
-    const qr = this.publicDs.createQueryRunner()
-    await qr.connect()
-    await qr.startTransaction()
-    try {
-      const tenantRepoTxn = qr.manager.getRepository(TenantModel)
-      const userRepoTxn = qr.manager.getRepository(UserModel)
-
-      await tenantRepoTxn.update({ uuid: tenant.uuid }, { status: TenantStatus.CREATE })
-      await userRepoTxn.update({ uuid: user.uuid }, { status: UserStatus.ACTIVE })
-      await qr.commitTransaction()
-
-      return { ok: true }
+      const payload = this.jwt.createJwtPayload(user, updatedTenant)
+      const tokens = await this.jwt.signTokenPair(payload)
+      return tokens
     } catch (err: any) {
-      await qr.rollbackTransaction().catch(() => { })
+      // 7. Tratamento de Erro Robusto
+      console.error(`Error creating tenant ${schemaName}:`, err)
+
+      // Rollback: Se algo falhou, limpamos o schema para permitir nova tentativa
+      // e voltamos o status para FAILED ou PENDING
+      await this.publicDs.query(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`)
+      await this.repoTenant.update(tenant.uuid, { status: TenantStatus.FAILED })
+
+      if (err?.code === "42P06") throw new ConflictException("Schema already exists")
       throw err
-    } finally {
-      await qr.release().catch(() => { })
     }
   }
 }

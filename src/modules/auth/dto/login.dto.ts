@@ -1,9 +1,9 @@
-import { IsEmail, IsString, Length, MaxLength, MinLength } from "class-validator"
+import { IsEmail, IsString, MinLength } from "class-validator"
 import { IUser } from "modules/users/domain/entities/user"
-import { ITenant } from "modules/tenants/domain/entities/tenant"
 import { UserResponseDTO, UserResponseMapper } from "modules/users/dto/list-users.dto"
 import { TokenPair } from "core/security/jwt/jwt.types"
-import { TenantStatus } from "modules/tenants/domain/valueObjects/tenant-status.enum"
+import { CompanyResponseDTO, CompanyResponseMapper } from "modules/companies/dto/list-companies.dto"
+import { ICompany } from "modules/companies/domain/entities/company"
 
 export class AuthenticateDTO {
   @IsEmail({}, { message: 'O login deve ser um e-mail válido' })
@@ -17,17 +17,20 @@ export class AuthenticateDTO {
 
 export class LoginResponseDTO {
   user!: UserResponseDTO
-  token?: string
-  refreshToken?: string
+  token!: string
+  refreshToken!: string
+  companies!: CompanyResponseDTO[]
 
   static from(input: {
     user: IUser
-    tokenPair?: TokenPair
+    tokenPair: TokenPair,
+    companies: ICompany[]
   }): LoginResponseDTO {
-    return {
-      user: UserResponseMapper.toListItem(input.user),
-      token: input.tokenPair?.accessToken,
-      refreshToken: input.tokenPair?.refreshToken
-    }
+    const dto = new LoginResponseDTO()
+    dto.user = UserResponseMapper.toDto(input.user)
+    dto.token = input.tokenPair.accessToken
+    dto.refreshToken = input.tokenPair.refreshToken
+    dto.companies = input.companies.map(c => CompanyResponseMapper.toDto(c))
+    return dto
   }
 }

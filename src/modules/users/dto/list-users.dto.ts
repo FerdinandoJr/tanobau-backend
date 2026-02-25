@@ -18,7 +18,7 @@ export type UserListResponseDTO = {
 }
 
 export const UserResponseMapper = {
-    toListItem(u: IUser): UserResponseDTO {
+    toDto(u: IUser): UserResponseDTO {
         return {
             uuid: u.uuid,
             firstName: u.firstName,

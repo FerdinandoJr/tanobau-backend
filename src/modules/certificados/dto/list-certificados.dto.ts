@@ -4,7 +4,7 @@ import { ICertificado } from "../domain/entities/certificado"
 
 export type CertificadoResponseDTO = {
     uuid: string
-    cnpj: CNPJ
+    cnpj: string
     companyName: string
     expirationDate: Date
     thumbprint: string
@@ -26,7 +26,7 @@ export const CertificadoResponseMapper = {
     toListItem(cert: ICertificado): CertificadoResponseDTO {
         return {
             uuid: cert.uuid,
-            cnpj: cert.cnpj,
+            cnpj: cert.cnpj.value,
             companyName: cert.companyName,
             expirationDate: cert.expirationDate,
             thumbprint: cert.thumbprint,

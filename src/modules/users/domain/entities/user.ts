@@ -1,6 +1,6 @@
 import { Email } from "core/valueObjects"
 import { UserStatus, UserType } from "../valueObjects"
-import { ITenant, Tenant } from "modules/tenants/domain/entities/tenant"
+import { ICompany } from "modules/companies/domain/entities/company"
 
 export type UserId = number
 
@@ -14,7 +14,7 @@ export interface IUser {
     status: UserStatus
     type: UserType
     createdAt: Date
-    tenant: ITenant | null
+    companies: ICompany[]
 
     generateVerificationCode(): string
     getFullName(): string
@@ -32,7 +32,7 @@ export class User implements IUser {
     status: UserStatus
     type: UserType
     createdAt: Date
-    tenant: ITenant | null
+    companies: ICompany[]
 
     constructor(props: UserProps) {
         this.id = props.id
@@ -44,7 +44,7 @@ export class User implements IUser {
         this.status = props.status
         this.type = props.type
         this.createdAt = props.createdAt
-        this.tenant = props.tenant
+        this.companies = props.companies ?? []
     }
 
 

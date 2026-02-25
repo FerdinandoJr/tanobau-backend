@@ -19,8 +19,9 @@ export class TenantRepository implements ITenantRepository {
 
     async findByUser(user: IUser): Promise<ITenant[]> {
         const tenants = await this.repo.createQueryBuilder("tenant")
-            .innerJoin("tenant.users", "userTenant")
-            .where("userTenant.userId = :userId", { userId: user.id })
+            .innerJoin("tenant.company", "company")
+            .innerJoin("company.userTenants", "ut")
+            .where("ut.userId = :userId", { userId: user.id })
             .getMany()
         return tenants.map(TenantUtils.toDomain)
     }
@@ -30,13 +31,18 @@ export class TenantRepository implements ITenantRepository {
         return ent ? TenantUtils.toDomain(ent) : null
     }
 
+    async findById(id: number): Promise<ITenant | null> {
+        const ent = await this.repo.findOne({ where: { id }, relations: ['company'] })
+        return ent ? TenantUtils.toDomain(ent) : null
+    }
+
     async findByUuid(uuid: string): Promise<ITenant | null> {
-        const ent = await this.repo.findOne({ where: { uuid }, relations: ['settings'] })
+        const ent = await this.repo.findOne({ where: { uuid }, relations: ['company'] })
         return ent ? TenantUtils.toDomain(ent) : null
     }
 
     async create(tenant: ITenant): Promise<ITenant> {
-        const ent = this.repo.create(TenantUtils.toModel(tenant))
+        const ent = this.repo.create(TenantUtils.toModel(tenant) as TenantModel)
         try {
             const saved = await this.repo.save(ent)
             return TenantUtils.toDomain(saved)

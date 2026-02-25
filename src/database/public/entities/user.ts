@@ -1,19 +1,16 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
 import { UserStatus, UserType } from "modules/users/domain/valueObjects"
 import { Email } from "core/valueObjects"
 import { emailTransformer } from "database/transformers/email.transformers"
-import { TenantModel } from "./tenant"
 
-@Entity({ schema: "public", name: "users" })
+import { UserTenantModel } from "./user-tenant"
+
+@Entity({ schema: "public", name: "users", comment: "Tabela de usuários cadastrados no sistema" })
 export class UserModel {
     @PrimaryGeneratedColumn({ comment: "Código auto-incremental" })
     id!: number
 
-    @Column({
-        type: "uuid",
-        comment: "Código unico do usuário",
-        unique: true
-    })
+    @Column({ type: "uuid", comment: "Código único do usuário", unique: true })
     uuid!: string
 
     @Column({ comment: "Primeiro nome do usuário" })
@@ -45,21 +42,20 @@ export class UserModel {
     @Column({
         type: 'enum',
         enum: UserType,
-        default: UserType.USER,
+        default: UserType.COMPANY,
         comment: 'Tipo de conta do usuario',
     })
     type!: UserType
 
-    @CreateDateColumn({ comment: "Data de criação" })
-    createdAt!: Date
-
     @Column({ type: "boolean", comment: "Verificação se o usuário está ativo/inativo", default: false })
     isActive!: boolean
 
-    @Column({ type: "integer", comment: "Código único do tenant" })
-    tenantId!: number
+    @CreateDateColumn({ comment: "Data de criação" })
+    createdAt!: Date
 
-    @OneToOne(() => TenantModel, (tenant) => tenant.user)
-    @JoinColumn({ name: "tenantId" })
-    tenant!: TenantModel
-}   
+    @UpdateDateColumn({ comment: "Data de atualização" })
+    updatedAt!: Date
+
+    @OneToMany(() => UserTenantModel, (userTenant) => userTenant.user)
+    userTenants!: UserTenantModel[]
+}

@@ -33,9 +33,9 @@ export class CreateUserDTO {
       email: new Email(this.email),
       password: this.password,
       status: UserStatus.ACTIVE,
-      type: UserType.USER,
+      type: UserType.ACCOUNTANT,
       createdAt: new Date(),
-      tenant: null,
+      companies: []
     })
   }
 }

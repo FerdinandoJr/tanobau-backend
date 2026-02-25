@@ -1,5 +1,5 @@
 import { UserModel } from "database/public/entities/user"
-import { TenantUtils } from "modules/tenants/data/utils/tenant.utils"
+import { CompanyUtils } from "modules/companies/data/utils/company.utils"
 import { IUser, User } from "modules/users/domain/entities/user"
 
 export type UserSortBy = typeof UserUtils.SORTABLE_FIELDS[number]
@@ -27,7 +27,7 @@ export class UserUtils {
             status: model.status,
             type: model.type,
             createdAt: model.createdAt,
-            tenant: model.tenant ? TenantUtils.toDomain(model.tenant) : null
+            companies: (model.userTenants ?? []).map(ut => CompanyUtils.toDomain(ut.company)),
         })
     }
 

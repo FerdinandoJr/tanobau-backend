@@ -1,7 +1,6 @@
-import { cnpjTransformer } from "database/transformers/cnpj.transformers"
 import { TenantStatus } from "modules/tenants/domain/valueObjects/tenant-status.enum"
 import { Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm"
-import { UserModel } from "./user"
+import { CompanyModel } from "./company"
 
 @Entity({ schema: "public", name: "tenants", comment: "Tabela de tenants, representa um schema que utiliza o sistema" })
 export class TenantModel {
@@ -35,6 +34,6 @@ export class TenantModel {
     @Column({ type: "boolean", comment: "Verificação se o tenant está ativo/inativo", default: false })
     isActive!: boolean
 
-    @OneToOne(() => UserModel, (user) => user.tenant)
-    user!: UserModel
+    @OneToOne(() => CompanyModel, (company) => company.tenant, { cascade: true })
+    company!: CompanyModel
 }
