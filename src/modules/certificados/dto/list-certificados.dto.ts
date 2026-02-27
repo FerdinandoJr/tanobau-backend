@@ -11,7 +11,6 @@ export type CertificadoResponseDTO = {
     ambiente: CertificadoAmbiente
     issuer?: string
     subject?: string
-    isPrimary: boolean
     isActive: boolean
     createdAt: Date
 }
@@ -33,7 +32,6 @@ export const CertificadoResponseMapper = {
             ambiente: cert.ambiente,
             issuer: cert.issuer,
             subject: cert.subject,
-            isPrimary: cert.isPrimary,
             isActive: cert.isActive,
             createdAt: cert.createdAt
         }

@@ -4,21 +4,21 @@ import { Auth } from "core/http/decorators/auth.decorator"
 import { SortByPipe } from "core/http/pipes/sortBy.pipe"
 import { SortDir, SortDirPipe } from "core/http/pipes/sortDir.pipe"
 
-import { NFeSortBy, NfesUtils } from "./data/utils/nfes.utils"
+import { CTeSortBy, CtesUtils } from "./data/utils/ctes.utils"
 import { DocumentoFiscalStatus } from "core/valueObjects/documento-fiscal-status.enum"
-import { NFesService } from "./nfes.services"
+import { CTesService } from "./ctes.services"
 
 @Auth()
-@Controller("nfes")
-export class NFesController {
-    constructor(private service: NFesService) { }
+@Controller("ctes")
+export class CTesController {
+    constructor(private service: CTesService) { }
 
-    @Get()
+    @Get()                               
     async list(
         @Query("limit", new DefaultValuePipe(20), ParseIntPipe) limit: number,
         @Query("start", new DefaultValuePipe(0), ParseIntPipe) start: number,
         @Query("sortDir", new SortDirPipe()) sortDir: SortDir,
-        @Query("sortBy", new SortByPipe<NFeSortBy>(NfesUtils.DEFAULT_SORT, NfesUtils.SORTABLE_FIELDS)) sortBy: NFeSortBy,
+        @Query("sortBy", new SortByPipe<CTeSortBy>(CtesUtils.DEFAULT_SORT, CtesUtils.SORTABLE_FIELDS)) sortBy: CTeSortBy,
         @Query("q") q?: string,
         @Query("status") rawStatus?: string | string[],
         @Query("uf") rawUf?: string | string[],
@@ -59,8 +59,9 @@ export class NFesController {
         })
     }
 
-    @Get("chave/:chave")
+  
+    @Get(":chave")
     async getByChave(@Param("chave") chave: string) {
-        return await this.service.getByChaveNFe(chave)
+        return await this.service.getByChaveCTe(chave)
     }
 }

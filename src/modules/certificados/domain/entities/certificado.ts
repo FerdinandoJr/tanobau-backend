@@ -19,7 +19,6 @@ export interface ICertificado {
     ambiente: CertificadoAmbiente
     issuer?: string
     subject?: string
-    isPrimary: boolean
     isActive: boolean
     createdAt: Date
 }
@@ -36,7 +35,6 @@ export class Certificado implements ICertificado {
     ambiente: CertificadoAmbiente
     issuer?: string
     subject?: string
-    isPrimary: boolean
     isActive: boolean
     createdAt: Date
 
@@ -52,7 +50,6 @@ export class Certificado implements ICertificado {
         this.ambiente = props.ambiente
         this.issuer = props.issuer
         this.subject = props.subject
-        this.isPrimary = props.isPrimary
         this.isActive = props.isActive
         this.createdAt = props.createdAt
     }

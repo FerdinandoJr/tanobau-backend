@@ -1,16 +1,16 @@
 import { Module } from "@nestjs/common"
 
-import { NFeRepository } from "./data/repositories/nfe-repository-impl"
-import { NFeController } from "./nfes.controller"
-import { NFeService } from "./nfes.service"
+import { NFeRepositoryImpl } from "./data/repositories/nfes-repository-impl"
+import { NFesController } from "./nfes.controller"
+import { NFesService } from "./nfes.services"
 
 import { JwtModule } from "core/security/jwt/jwt.module"
 import { DatabaseModule } from "database/database.module"
 
 @Module({
     imports: [DatabaseModule, JwtModule],
-    controllers: [NFeController],
-    providers: [NFeService, NFeRepository],
-    exports: [NFeService],
+    controllers: [NFesController],
+    providers: [NFesService, NFeRepositoryImpl],
+    exports: [NFesService],
 })
 export class NFeModule { }

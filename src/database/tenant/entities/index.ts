@@ -1,16 +1,21 @@
 import { CertificadoModel } from "./certificados"
-import { ConfiguracaoSefaz } from "./configura-sefaz"
-import { ConfiguracaoSefazPorUF } from "./configuracao-sefaz-por-uf"
-import { NFeResumoModel } from "./nfe-resumo"
-import { NFeModel } from "./nfes"
-import { SyncLogModel } from "./sync_logs"
-
+import { NFeModel } from "./nfe"
+import { CTeModel } from "./cte"
+import { DocumentoEventoModel } from "./documento-evento"
+import { DuplicataFiscalModel } from "./duplicata-fiscal"
+import { NFeItemModel } from "./nfe-item"
+import { CTeDocRelacionadoModel } from "./cte-documentos-relacionados"
+import { SefazConfigModel } from "./sefaz-config"
+import { DocumentoFiscalBaseModel } from "./documento-fiscal-base"
 
 export const TenantModels = [
     CertificadoModel,
-    ConfiguracaoSefaz,
-    ConfiguracaoSefazPorUF,
+    DocumentoFiscalBaseModel,
     NFeModel,
-    SyncLogModel,
-    NFeResumoModel
+    CTeModel,
+    DocumentoEventoModel,
+    DuplicataFiscalModel,
+    NFeItemModel,
+    CTeDocRelacionadoModel,
+    SefazConfigModel,
 ]

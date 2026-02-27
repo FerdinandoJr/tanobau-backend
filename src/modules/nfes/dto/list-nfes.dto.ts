@@ -1,24 +1,17 @@
-import { DocumentStatus } from "modules/nfes/domain/valueObjects/document-status.enum"
-import { DocumentType } from "modules/nfes/domain/valueObjects/document-type.enum"
 import { INFe } from "../domain/entities/nfe"
 
 export type NFeResponseDTO = {
-    uuid: string
-    ch_nfe: string
-    nsu: string
-    uf: string
-    numero_nfe: number
-    serie_nfe: number
-    tipo_documento: DocumentType
-    data_emissao: Date
-    valor_total: number
-    cnpj_emitente: string
-    nome_emitente?: string
-    cnpj_destinatario?: string
-    nome_destinatario?: string
-    natureza_operacao?: string
-    tipo_movimentacao?: "entrada" | "saida"
-    status: DocumentStatus
+    id: number
+    chaveAcesso: string
+    documentoEmitente: string | null
+    documentoDestinatario: string | null
+    numero: string
+    serie: string
+    status: string
+    dataEmissao: Date | null
+    totalNota: string | null
+    valorIcms: string | null
+    ufDestino: string | null
     createdAt: Date
 }
 
@@ -31,23 +24,18 @@ export type NFeListResponseDTO = {
 export const NFeResponseMapper = {
     toListItem(nfe: INFe): NFeResponseDTO {
         return {
-            uuid: nfe.uuid,
-            ch_nfe: nfe.ch_nfe,
-            nsu: nfe.nsu,
-            uf: nfe.uf,
-            numero_nfe: nfe.numero_nfe,
-            serie_nfe: nfe.serie_nfe,
-            tipo_documento: nfe.tipo_documento,
-            data_emissao: nfe.data_emissao,
-            valor_total: nfe.valor_total,
-            cnpj_emitente: nfe.cnpj_emitente,
-            nome_emitente: nfe.nome_emitente,
-            cnpj_destinatario: nfe.cnpj_destinatario,
-            nome_destinatario: nfe.nome_destinatario,
-            natureza_operacao: nfe.natureza_operacao,
-            tipo_movimentacao: nfe.tipo_movimentacao,
+            id: nfe.id,
+            chaveAcesso: nfe.chaveAcesso,
+            documentoEmitente: nfe.documentoEmitente ?? null,
+            documentoDestinatario: nfe.documentoDestinatario ?? null,
+            numero: nfe.numero,
+            serie: nfe.serie,
             status: nfe.status,
-            createdAt: nfe.createdAt
+            dataEmissao: nfe.dataEmissao ?? null,
+            totalNota: nfe.totalNota?.toString() ?? null,
+            valorIcms: nfe.valorIcms?.toString() ?? null,
+            ufDestino: nfe.ufDestino,
+            createdAt: nfe.capturadoEm || nfe.atualizadoEm || new Date()
         }
     }
 }

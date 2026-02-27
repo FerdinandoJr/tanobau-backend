@@ -1,5 +1,5 @@
 import { ConflictException, Inject, Injectable, NotFoundException } from "@nestjs/common"
-import { Brackets, DataSource, In, Repository, MoreThanOrEqual, LessThanOrEqual } from "typeorm"
+import { Brackets, DataSource, In, Repository } from "typeorm"
 
 import { CertificadoModel } from "database/tenant/entities/certificados"
 import { TENANT_DATA_SOURCE } from "database/tenant/tenant.datasource.provider"
@@ -7,13 +7,40 @@ import { ICertificado } from "modules/certificados/domain/entities/certificado"
 import { ICertificadoRepository, CertificadoFilter } from "modules/certificados/domain/repositories/certificado-repository"
 import { CertificadosUtils } from "../utils/certificados.utils"
 import { CNPJ } from "core/valueObjects/cnpj"
+import { SefazConfigModel } from "database/tenant/entities/sefaz-config"
+import { uuidv7 } from "uuidv7"
 
 @Injectable()
 export class CertificadoRepository implements ICertificadoRepository {
     private repo: Repository<CertificadoModel>
+    private sefazRepo: Repository<SefazConfigModel>
 
-    constructor(@Inject(TENANT_DATA_SOURCE) ds: DataSource) {
+    constructor(@Inject(TENANT_DATA_SOURCE) private ds: DataSource) {
         this.repo = ds.getRepository(CertificadoModel)
+        this.sefazRepo = ds.getRepository(SefazConfigModel)
+    }
+
+    private async upsertSefazConfig(cert: CertificadoModel) {
+        let config = await this.sefazRepo.findOne({
+            where: { cnpjInteressado: cert.cnpj }
+        })
+
+        if (!config) {
+            config = this.sefazRepo.create({
+                uuid: uuidv7(),
+                cnpjInteressado: cert.cnpj,
+                ultimoNSU_CTe: "0",
+                ultimoNSU_NFe: "0",
+                ambiente: cert.ambiente,
+                certificadoId: cert.id,
+                certificado: cert
+            })
+        } else {
+            config.certificadoId = cert.id
+            config.ambiente = cert.ambiente
+        }
+
+        await this.sefazRepo.save(config)
     }
 
     async findMany(filter: CertificadoFilter) {
@@ -107,6 +134,9 @@ export class CertificadoRepository implements ICertificadoRepository {
         const entities = certificados.map(c => CertificadosUtils.toModel(c))
         try {
             const savedEntities = await this.repo.save(entities)
+            for (const ent of savedEntities) {
+                await this.upsertSefazConfig(ent)
+            }
             return savedEntities.map(saved => CertificadosUtils.toDomain(saved))
         } catch (err: any) {
             if (err?.code === "23505") {
@@ -120,6 +150,7 @@ export class CertificadoRepository implements ICertificadoRepository {
         const ent = this.repo.create(CertificadosUtils.toModel(certificado))
         try {
             const saved = await this.repo.save(ent)
+            await this.upsertSefazConfig(saved)
             return CertificadosUtils.toDomain(saved)
         } catch (err: any) {
             if (err?.code === "23505") {
@@ -138,6 +169,9 @@ export class CertificadoRepository implements ICertificadoRepository {
 
         try {
             const saved = await this.repo.save(models)
+            for (const ent of saved) {
+                await this.upsertSefazConfig(ent)
+            }
             return saved.map((c) => CertificadosUtils.toDomain(c))
         } catch (err: any) {
             if (err?.code === "23505") {
@@ -158,6 +192,7 @@ export class CertificadoRepository implements ICertificadoRepository {
 
         try {
             const saved = await this.repo.save(ent)
+            await this.upsertSefazConfig(saved)
             return CertificadosUtils.toDomain(saved)
         } catch (err: any) {
             if (err?.code === "23505") {

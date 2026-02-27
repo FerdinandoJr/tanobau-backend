@@ -1,5 +1,7 @@
 import { CertificadoModel } from "database/tenant/entities/certificados"
 import { ICertificado, Certificado } from "modules/certificados/domain/entities/certificado"
+import { Ambiente } from "core/valueObjects/ambiente"
+import { CertificadoAmbiente } from "modules/certificados/domain/valueObjects/certificado-ambiente.enum"
 
 export type CertificadoSortBy = typeof CertificadosUtils.SORTABLE_FIELDS[number]
 
@@ -12,7 +14,6 @@ export class CertificadosUtils {
         "expirationDate",
         "thumbprint",
         "ambiente",
-        "isPrimary",
         "isActive",
         "createdAt"
     ] as const
@@ -29,10 +30,9 @@ export class CertificadosUtils {
             companyName: model.companyName,
             expirationDate: model.expirationDate,
             thumbprint: model.thumbprint,
-            ambiente: model.ambiente,
+            ambiente: model.ambiente === Ambiente.PRODUCAO ? CertificadoAmbiente.PRODUCAO : CertificadoAmbiente.HOMOLOGACAO,
             issuer: model.issuer,
             subject: model.subject,
-            isPrimary: model.isPrimary,
             isActive: model.isActive,
             createdAt: model.createdAt
         })
@@ -50,10 +50,11 @@ export class CertificadosUtils {
         if (domain.companyName !== undefined) model.companyName = domain.companyName
         if (domain.expirationDate !== undefined) model.expirationDate = domain.expirationDate
         if (domain.thumbprint !== undefined) model.thumbprint = domain.thumbprint
-        if (domain.ambiente !== undefined) model.ambiente = domain.ambiente
+        if (domain.ambiente !== undefined) {
+             model.ambiente = domain.ambiente === CertificadoAmbiente.PRODUCAO ? Ambiente.PRODUCAO : Ambiente.HOMOLOGACAO
+        }
         if (domain.issuer !== undefined) model.issuer = domain.issuer
         if (domain.subject !== undefined) model.subject = domain.subject
-        if (domain.isPrimary !== undefined) model.isPrimary = domain.isPrimary
         if (domain.isActive !== undefined) model.isActive = domain.isActive
 
         return model

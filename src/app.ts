@@ -6,10 +6,10 @@ import { DatabaseModule } from "./database/database.module"
 import { CertificadoModule } from "./modules/certificados/certificados.module"
 import { CompanyModule } from "./modules/companies/company.module"
 import { NFeModule } from "./modules/nfes/nfes.module"
-import { SefazModule } from "./modules/sefaz/sefaz.module"
+import { CTesModule } from "./modules/ctes/ctes.module"
 import { TenantModule } from "./modules/tenants/tenant.module"
 import { UserModule } from "./modules/users/user.module"
-import { AuthModule } from "modules/auth/auth.module"
+import { AuthModule } from "./modules/auth/auth.module"
 
 
 @Module({
@@ -22,7 +22,7 @@ import { AuthModule } from "modules/auth/auth.module"
         CompanyModule,
         CertificadoModule,
         NFeModule,
-        SefazModule,
+        CTesModule,
     ],
 })
 export class AppModule { }

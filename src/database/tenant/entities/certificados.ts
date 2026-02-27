@@ -1,7 +1,9 @@
-import { CNPJ } from "core/valueObjects/cnpj"
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToOne } from "typeorm"
+import { SefazConfigModel } from "./sefaz-config"
 import { cnpjTransformer } from "database/transformers/cnpj.transformers"
-import { CertificadoAmbiente } from "modules/certificados/domain/valueObjects/certificado-ambiente.enum"
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm"
+import { CNPJ } from "core/valueObjects"
+import { Ambiente } from "core/valueObjects/ambiente"
+
 
 @Entity({ name: "certificados", comment: "Tabela de certificados" })
 export class CertificadoModel {
@@ -36,11 +38,11 @@ export class CertificadoModel {
 
     @Column({
         type: "enum",
-        enum: CertificadoAmbiente,
-        default: CertificadoAmbiente.HOMOLOGACAO,
+        enum: Ambiente,
+        default: Ambiente.HOMOLOGACAO,
         comment: "Ambiente ao qual o certificado se destina"
     })
-    ambiente!: CertificadoAmbiente
+    ambiente!: Ambiente
 
     @Column({ type: "varchar", nullable: true, comment: "Emissor do certificado (Issuer)" })
     issuer?: string
@@ -48,12 +50,12 @@ export class CertificadoModel {
     @Column({ type: "varchar", nullable: true, comment: "Subject do certificado" })
     subject?: string
 
-    @Column({ type: "boolean", default: false, comment: "Indica se é o certificado principal do tenant" })
-    isPrimary!: boolean
-
     @Column({ default: true, comment: "Verificação se o certificado está ativo/inativo" })
     isActive!: boolean
 
     @CreateDateColumn({ comment: "Data de criação" })
     createdAt!: Date
+
+    @OneToOne(() => SefazConfigModel, sefazConfig => sefazConfig.certificado)
+    sefazConfig!: SefazConfigModel
 }

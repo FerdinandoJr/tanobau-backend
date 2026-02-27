@@ -5,7 +5,7 @@ import { createClient, RedisClientType } from "redis"
 @Injectable()
 export class RedisService implements OnModuleDestroy {
   private client: RedisClientType
-  private connectPromise: Promise<void> | null = null
+  private connectPromise: Promise<any> | null = null
   private enabled: boolean
 
   constructor(private readonly config: ConfigService) {

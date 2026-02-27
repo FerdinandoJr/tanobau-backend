@@ -10,6 +10,6 @@ export const moneyTransformer: ValueTransformer = {
     from:(dbValue: unknown): Money | null => {
         if (dbValue == null) return null
         const str = String(dbValue)
-        return { amount: str, currency: "BRL", scale: 2 }
+        return new Money(str, "BRL", 2)
     }
 }
