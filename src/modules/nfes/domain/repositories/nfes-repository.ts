@@ -1,10 +1,13 @@
 import { Paginated } from "core/valueObjects/paginated"
 import { INFe } from "../entities/nfe"
 import { DocumentoFiscalStatus } from "core/valueObjects/documento-fiscal-status.enum"
+import { NFeType } from "../valueObjects/nfe-type.enum"
+
 
 export interface NFeFilter {
     limit: number
     start: number
+    type?: NFeType
     q?: string
     status?: DocumentoFiscalStatus[]
     uf?: string[]

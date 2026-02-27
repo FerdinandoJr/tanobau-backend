@@ -13,7 +13,7 @@ export class CTesService {
         return {
             total: result.total,
             filteredTotal: result.filteredTotal,
-            items: result.items.map(n => CTeResponseMapper.toListItem(n))
+            items: result.items.map(n => CTeResponseMapper.toDto(n))
         }
     }
 
@@ -21,6 +21,6 @@ export class CTesService {
     async getByChaveCTe(chave: string) {
         const cte = await this.repo.findByChaveCTe(chave)
         if (!cte) throw new NotFoundException("CTe não encontrada")
-        return CTeResponseMapper.toListItem(cte)
+        return CTeResponseMapper.toDto(cte)
     }
 }

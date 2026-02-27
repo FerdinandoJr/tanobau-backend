@@ -13,13 +13,13 @@ export class NFesService {
         return {
             total: result.total,
             filteredTotal: result.filteredTotal,
-            items: result.items.map(n => NFeResponseMapper.toListItem(n))
+            items: result.items.map(n => NFeResponseMapper.toDto(n))
         }
     }
 
     async getByChaveNFe(chave: string) {
         const nfe = await this.repo.findByChaveNFe(chave)
         if (!nfe) throw new NotFoundException("NFe não encontrada")
-        return nfe
+        return NFeResponseMapper.toDto(nfe)
     }
 }

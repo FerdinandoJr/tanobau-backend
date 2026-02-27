@@ -1,5 +1,4 @@
 import { Money } from "core/valueObjects"
-import { CNPJ } from "core/valueObjects/cnpj"
 import { DocumentoFiscalBase } from "core/valueObjects/documento-fiscal"
 import { DocumentoFiscalStatus } from "core/valueObjects/documento-fiscal-status.enum"
 
@@ -16,35 +15,36 @@ export class NFe implements INFe {
     
     id: number
     chaveAcesso: string
-    documentoEmitente?: string | null
-    documentoDestinatario?: string | null
+    documentoEmitente?: string | null | undefined
+    documentoDestinatario?: string | null | undefined
     numero: string
     serie: string
-    status: DocumentoFiscalStatus 
-    protocolo: string | null
-    dataEmissao: Date
-    dataAutorizacao: Date | null
-    xmlBruto: string | null
+    status: DocumentoFiscalStatus
+    protocolo?: string | null | undefined
+    dataEmissao?: Date | null | undefined
+    dataAutorizacao?: Date | null | undefined
+    xmlBruto?: string | null | undefined
     capturadoEm: Date
     atualizadoEm: Date
-    
-    constructor(props: Partial<INFe> = {}) {
+
+    constructor(props: INFe) {
         this.totalNota = props.totalNota ?? null
         this.valorIcms = props.valorIcms ?? null
         this.ufDestino = props.ufDestino ?? null
 
-        this.id = props.id as number
-        this.chaveAcesso = props.chaveAcesso as string
+        this.id = props.id
+        this.chaveAcesso = props.chaveAcesso
         this.documentoEmitente = props.documentoEmitente ?? null
         this.documentoDestinatario = props.documentoDestinatario ?? null
-        this.numero = props.numero as string
-        this.serie = props.serie as string
-        this.status = props.status as DocumentoFiscalStatus
+        this.numero = props.numero
+        this.serie = props.serie
+        this.status = props.status
         this.protocolo = props.protocolo ?? null
-        this.dataEmissao = props.dataEmissao as Date
+        this.dataEmissao = props.dataEmissao
         this.dataAutorizacao = props.dataAutorizacao ?? null
         this.xmlBruto = props.xmlBruto ?? null
-        this.capturadoEm = props.capturadoEm as Date
-        this.atualizadoEm = props.atualizadoEm as Date
+        this.capturadoEm = props.capturadoEm
+        this.atualizadoEm = props.atualizadoEm
     }
+
 }

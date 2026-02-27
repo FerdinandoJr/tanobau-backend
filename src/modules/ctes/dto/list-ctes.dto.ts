@@ -28,8 +28,7 @@ export type CTeListResponseDTO = {
 }
 
 export const CTeResponseMapper = {
-    toListItem(cte: ICTe): CTeResponseDTO {
-
+    toDto(cte: ICTe): CTeResponseDTO {
         return {
             chaveAcesso: cte.chaveAcesso,
             documentoEmitente: cte.documentoEmitente,

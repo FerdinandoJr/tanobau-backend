@@ -1,18 +1,22 @@
+import { DocumentoFiscalStatus } from "core/valueObjects/documento-fiscal-status.enum"
 import { INFe } from "../domain/entities/nfe"
 
 export type NFeResponseDTO = {
-    id: number
     chaveAcesso: string
-    documentoEmitente: string | null
-    documentoDestinatario: string | null
+    documentoEmitente?: string | null
+    documentoDestinatario?: string | null
     numero: string
     serie: string
-    status: string
-    dataEmissao: Date | null
-    totalNota: string | null
-    valorIcms: string | null
-    ufDestino: string | null
-    createdAt: Date
+    status: DocumentoFiscalStatus
+    protocolo?: string | null
+    dataEmissao?: Date | null
+    dataAutorizacao?: Date | null
+    xmlBruto?: string | null
+    capturadoEm: Date
+    atualizadoEm: Date
+    totalNota?: number | null
+    valorIcms?: number | null
+    ufDestino?: string | null
 }
 
 export type NFeListResponseDTO = {
@@ -22,9 +26,8 @@ export type NFeListResponseDTO = {
 }
 
 export const NFeResponseMapper = {
-    toListItem(nfe: INFe): NFeResponseDTO {
+    toDto(nfe: INFe): NFeResponseDTO {
         return {
-            id: nfe.id,
             chaveAcesso: nfe.chaveAcesso,
             documentoEmitente: nfe.documentoEmitente ?? null,
             documentoDestinatario: nfe.documentoDestinatario ?? null,
@@ -32,10 +35,13 @@ export const NFeResponseMapper = {
             serie: nfe.serie,
             status: nfe.status,
             dataEmissao: nfe.dataEmissao ?? null,
-            totalNota: nfe.totalNota?.toString() ?? null,
-            valorIcms: nfe.valorIcms?.toString() ?? null,
+            totalNota: nfe.totalNota?.value ?? null,
+            valorIcms: nfe.valorIcms?.value ?? null,
             ufDestino: nfe.ufDestino,
-            createdAt: nfe.capturadoEm || nfe.atualizadoEm || new Date()
+            capturadoEm: nfe.capturadoEm,
+            atualizadoEm: nfe.atualizadoEm,
+            dataAutorizacao: nfe.dataAutorizacao,
+            xmlBruto: nfe.xmlBruto
         }
     }
 }

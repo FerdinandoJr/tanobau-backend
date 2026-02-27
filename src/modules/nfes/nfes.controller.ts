@@ -59,7 +59,7 @@ export class NFesController {
         })
     }
 
-    @Get("chave/:chave")
+    @Get("/:chave")
     async getByChave(@Param("chave") chave: string) {
         return await this.service.getByChaveNFe(chave)
     }

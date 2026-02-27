@@ -6,6 +6,7 @@ import { INFe } from "../../domain/entities/nfe"
 import { NFeModel } from "database/tenant/entities/nfe"
 import { TENANT_DATA_SOURCE } from "database/tenant/tenant.datasource.provider"
 import { INFeRepository, NFeFilter } from "../../domain/repositories/nfes-repository"
+import { NFeType } from "modules/nfes/domain/valueObjects/nfe-type.enum"
 
 @Injectable()
 export class NFeRepositoryImpl implements INFeRepository {
@@ -16,35 +17,47 @@ export class NFeRepositoryImpl implements INFeRepository {
     }
 
     async findMany(filter: NFeFilter): Promise<Paginated<INFe>> {
-        const { limit, start, q, status, uf, cnpj_emitente, data_inicio, data_fim, sortBy, sortDir } = filter
+        const { limit, start, type, q, status, uf, cnpj_emitente, data_inicio, data_fim, sortBy, sortDir } = filter
         const alias = "nfe"
 
         const qb = this.repo.createQueryBuilder(alias).select([
             `${alias}.id`,
             `${alias}.chaveAcesso`,
-            `${alias}.cnpjEmitente`,
-            `${alias}.cnpjDestinatario`,
+            `${alias}.documentoEmitente`,
+            `${alias}.documentoDestinatario`,
             `${alias}.numero`,
             `${alias}.serie`,
             `${alias}.status`,
             `${alias}.protocolo`,
             `${alias}.dataEmissao`,
             `${alias}.dataAutorizacao`,
-            `${alias}.capturadoEm`,
-            `${alias}.atualizadoEm`,
             `${alias}.totalNota`,
             `${alias}.valorIcms`,
-            `${alias}.ufDestino`
+            `${alias}.ufDestino`,
+            `${alias}.capturadoEm`,
+            `${alias}.atualizadoEm`
         ])
 
+
+        // --- LÓGICA DE ENTRADA / SAÍDA ---
+        if (type === NFeType.ENTRADA) {
+            qb.andWhere(`${alias}.documentoDestinatario = :tenantCnpj`, { tenantCnpj });
+        } else if (type === NFeType.SAIDA) {
+            qb.andWhere(`${alias}.documentoEmitente = :tenantCnpj`, { tenantCnpj });
+        }
+
+        // Filtro Global
         if (q?.trim()) {
+            const search = `%${q.trim()}%`;
             qb.andWhere(new Brackets(or => {
-                or.where(`${alias}.chaveAcesso ILIKE :q`, { q: `%${q.trim()}%` })
-                    .orWhere(`${alias}.cnpjEmitente ILIKE :q`, { q: `%${q.trim()}%` })
-                    .orWhere(`${alias}.cnpjDestinatario ILIKE :q`, { q: `%${q.trim()}%` })
+                or.where(`${alias}.chaveAcesso ILIKE :q`, { q: search })
+                  .orWhere(`${alias}.documentoEmitente ILIKE :q`, { q: search })
+                  .orWhere(`${alias}.documentoDestinatario ILIKE :q`, { q: search })
+                  .orWhere(`${alias}.numero ILIKE :q`, { q: search })
             }))
         }
 
+        // Filtros Específicos
         if (status?.length) {
             qb.andWhere(`${alias}.status IN (:...status)`, { status })
         }
@@ -54,9 +67,12 @@ export class NFeRepositoryImpl implements INFeRepository {
         }
 
         if (cnpj_emitente?.trim()) {
-            qb.andWhere(`${alias}.cnpjEmitente = :cnpj_emitente`, { cnpj_emitente: cnpj_emitente.trim() })
+            qb.andWhere(`${alias}.documentoEmitente = :cnpj_emitente`, { 
+                cnpj_emitente: cnpj_emitente.trim() 
+            })
         }
 
+        // Datas
         if (data_inicio && data_fim) {
             qb.andWhere(`${alias}.dataEmissao BETWEEN :data_inicio AND :data_fim`, { data_inicio, data_fim })
         } else if (data_inicio) {
@@ -65,18 +81,26 @@ export class NFeRepositoryImpl implements INFeRepository {
             qb.andWhere(`${alias}.dataEmissao <= :data_fim`, { data_fim })
         }
 
-        const orderField = sortBy || NfesUtils.DEFAULT_SORT
+        // Ordenação e Paginação
+        const orderField = sortBy || 'dataEmissao'
         const dir = sortDir?.toUpperCase() === "DESC" ? "DESC" : "ASC"
-        qb.orderBy(`${alias}.${String(orderField)}`, dir)
+        qb.orderBy(`${alias}.${orderField}`, dir)
+
+        const take = Number(limit) || 20
+        const skip = Number(start) || 0
 
         const [items, filteredTotal] = await qb
-            .skip(start)
-            .take(limit)
+            .skip(skip)
+            .take(take)
             .getManyAndCount()
 
         const total = await this.repo.count()
 
-        return { total, filteredTotal, items: items.map(NfesUtils.toDomain) }
+        return { 
+            total, 
+            filteredTotal, 
+            items: items.map(item => NfesUtils.toDomain(item)) 
+        }
     }
 
     async findByChaveNFe(chave: string): Promise<INFe | null> {
